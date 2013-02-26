@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <st-source>
-<time-stamp>From VisualWorks® Personal Use Edition, 7.9.1 of October 18, 2012 on February 26, 2013 at 1:29:27 PM</time-stamp>
+<time-stamp>From VisualWorks® Personal Use Edition, 7.9.1 of October 18, 2012 on February 26, 2013 at 4:14:47 PM</time-stamp>
 
 
 <component-created>
@@ -20,6 +20,21 @@
 <private>false</private>
 <indexed-type>none</indexed-type>
 <inst-vars>amount date </inst-vars>
+<class-inst-vars></class-inst-vars>
+<imports></imports>
+<category></category>
+<attributes>
+<package>EECS-395-495-P2</package>
+</attributes>
+</class>
+
+<class>
+<name>Withdrawal</name>
+<environment>Smalltalk</environment>
+<super>Transaction</super>
+<private>false</private>
+<indexed-type>none</indexed-type>
+<inst-vars></inst-vars>
 <class-inst-vars></class-inst-vars>
 <imports></imports>
 <category></category>
@@ -79,7 +94,7 @@
 <super>UI.ApplicationModel</super>
 <private>false</private>
 <indexed-type>none</indexed-type>
-<inst-vars>CustomerName CustomerAddress CustomerIdOut customerType customerIdOut customerAddress customerName loanInterest accountNumberOut savingsInit savingsInterest accountType checkingInit loanInit CustomerIdIn customerIdIn empStatus </inst-vars>
+<inst-vars>CustomerName CustomerAddress CustomerIdOut customerType customerIdOut customerAddress customerName loanInterest accountNumberOut savingsInit savingsInterest accountType checkingInit loanInit CustomerIdIn customerIdIn empStatus queryResultLarge queryResultSmall customerIDOrName queryResult queryAccountType removeNum removeID accountID paymentType paymentDate automaticPaymentOutput </inst-vars>
 <class-inst-vars></class-inst-vars>
 <imports></imports>
 <category></category>
@@ -194,12 +209,12 @@
 </class>
 
 <class>
-<name>Withdrawal</name>
+<name>AutomaticPayment</name>
 <environment>Smalltalk</environment>
-<super>Transaction</super>
+<super>Checking</super>
 <private>false</private>
 <indexed-type>none</indexed-type>
-<inst-vars></inst-vars>
+<inst-vars>paymentType paymentDate </inst-vars>
 <class-inst-vars></class-inst-vars>
 <imports></imports>
 <category></category>
@@ -236,19 +251,21 @@
 
 <body package="EECS-395-495-P2" selector="customersOfType:">customersOfType: type	| bossFile total cur printStr |	bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no customers!'.	]	ifTrue: [		total := 0.		bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.		[[bossFile atEnd] whileFalse: [			cur := bossFile next.			((cur class) = type)			ifTrue: [				total := total + 1.			]]]			ensure: [bossFile close].	].	printStr := 'The total number of customers of type: ', (type printString), ' is: ', (total printString).	^printStr.</body>
 
-<body package="EECS-395-495-P2" selector="displayUser:">displayUser: searchField	| customer bossFile cur printStr tmpAcct |		customer := nil.	bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.	[[bossFile atEnd] whileFalse: [		cur := bossFile next.		((cur customerID = searchField) or: [(cur name = searchField)])		ifTrue: [			customer := cur.		bossFile setToEnd]]]		ensure: [bossFile close].		customer = nil	ifTrue: [		printStr := 'Searched customer does not exist!'.	]	ifFalse: [		tmpAcct := Accounts new.		printStr := customer toString, '&lt;n&gt;', 'Accounts:&lt;n&gt;', (tmpAcct displayUser: (customer customerID)).	].	^(printStr expandMacros).</body>
+<body package="EECS-395-495-P2" selector="displayUser:">displayUser: searchField	| customer bossFile cur printStr tmpAcct |		customer := nil.	bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.	[[bossFile atEnd] whileFalse: [		cur := bossFile next.		(((cur customerID) printString = searchField) or: [(cur name = searchField)])		ifTrue: [			customer := cur.		bossFile setToEnd]]]		ensure: [bossFile close].		customer = nil	ifTrue: [		printStr := 'Searched customer does not exist!'.	]	ifFalse: [		tmpAcct := Accounts new.		printStr := customer toString, '&lt;n&gt;', 'Accounts:&lt;n&gt;', (tmpAcct displayUser: (customer customerID printString)).	].	^(printStr expandMacros).</body>
 
 <body package="EECS-395-495-P2" selector="printAll">printAll	| bossFile customerArr printStr |	bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no customers!'.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.		[customerArr := bossFile contents.]			ensure: [bossFile close].	].	printStr := ''.	1 to: (customerArr size) do: [ :index |		printStr := printStr, '&lt;n&gt;', ((customerArr at: index) toString).	].	^(printStr expandMacros).</body>
 
 <body package="EECS-395-495-P2" selector="totalCustomers">totalCustomers	| bossFile customerArr printStr |	bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no customers!'.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.		[customerArr := bossFile contents.]			ensure: [bossFile close].	].	printStr := 'The total number of customers is: ', ((customerArr size) printString).	^printStr.</body>
 
-<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := 'Customer ID: ', (customerID printString).	printStr := printStr, '&lt;t&gt;Customer type: ', ((self class) printString).	printStr := printStr, '&lt;t&gt;Name: ', name.	^printStr.</body>
+<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := 'Customer ID: ', (customerID printString).	printStr := printStr, '&lt;n&gt;Customer type: ', ((self class) printString).	printStr := printStr, '&lt;n&gt;Name: ', name.	^printStr.</body>
 </methods>
 
 <methods>
 <class-id>Customers</class-id> <category>modifying</category>
 
-<body package="EECS-395-495-P2" selector="removeCustomer:">removeCustomer: id	| customers bossFile store pos |		bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no customers!'.	].	bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.	[customers := bossFile contents]		ensure: [bossFile close].	pos := nil.	1 to: (customers size) do: [ :index |		((customers at: index) customerID) = id ifTrue: [pos := index.].	].	pos = nil ifTrue: [		^'Customer does not exist!'.	]	ifFalse: [		store := (customers copyFrom: 1 to: (pos - 1)), (customers copyFrom: (pos + 1) to: (customers size)).		bossFile := BinaryObjectStorage onNew: 'customers.b' asFilename writeStream.		[bossFile nextPutAll: store]			ensure: [bossFile close].	].	^'Customer successfully deleted.'.</body>
+<body package="EECS-395-495-P2" selector="removeCustomer:">removeCustomer: id	| customers bossFile store pos |		bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no customers!'.	].	bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.	[customers := bossFile contents]		ensure: [bossFile close].	pos := nil.	1 to: (customers size) do: [ :index |		((customers at: index) customerID) printString = id		ifTrue: [			pos := index.		].	].	pos = nil ifTrue: [		^'Customer does not exist!'.	]	ifFalse: [		store := (customers copyFrom: 1 to: (pos - 1)), (customers copyFrom: (pos + 1) to: (customers size)).		bossFile := BinaryObjectStorage onNew: 'customers.b' asFilename writeStream.		[bossFile nextPutAll: store]			ensure: [bossFile close].	].	^id.</body>
+
+<body package="EECS-395-495-P2" selector="removeAccounts:">removeAccounts: id	| bossFile accountsArr accounts nextIndex |		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.	[accountsArr := bossFile contents.]		ensure: [bossFile close].		accounts := Array new: (accountsArr size).	nextIndex := 1.	1 to: (accountsArr size) do: [ :index |		((accountsArr at: index) customerID) printString = id		ifFalse: [			accounts at: nextIndex put: (accountsArr at: index).			nextIndex := nextIndex + 1.		].	].	accounts := accounts copyFrom: 1 to: (nextIndex - 1).		bossFile := BinaryObjectStorage onNew: 'accounts.b' asFilename writeStream.	[bossFile nextPutAll: accounts]		ensure: [bossFile close].	^'Accounts removed.'.</body>
 </methods>
 
 <methods>
@@ -256,7 +273,7 @@
 
 <body package="EECS-395-495-P2" selector="initialize">initialize	"Initialize a newly created instance. This method must answer the receiver."	super initialize.	" *** Edit the following to properly initialize instance variables ***"	name := nil.	address := nil.	customerID := nil.	" *** And replace this comment with additional initialization code *** "	^self</body>
 
-<body package="EECS-395-495-P2" selector="initialize:address:">initialize: customerName address: customerAddress	| bossFile customerArr |		bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		customerID := 1.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.		[customerArr := bossFile contents.]			ensure: [bossFile close].		customerID := ((customerArr at: (customerArr size)) customerID) + 1.	].	name := customerName.	address := customerAddress.	^customerID.</body>
+<body package="EECS-395-495-P2" selector="initialize:address:">initialize: customerName address: customerAddress	| bossFile customerArr |		bossFile := 'customers.b' asFilename.	bossFile exists ifFalse: [		customerID := 1.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'customers.b' asFilename readStream.		[customerArr := bossFile contents.]			ensure: [bossFile close].		((customerArr size) = 0)		ifTrue: [			customerID := 1.		]		ifFalse: [			customerID := ((customerArr at: (customerArr size)) customerID) + 1.		].	].	name := customerName.	address := customerAddress.	^customerID.</body>
 </methods>
 
 
@@ -290,13 +307,13 @@
 
 <body package="EECS-395-495-P2" selector="totalLoans">totalLoans	| bossFile total printStr cur |	bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no accounts!'.	]	ifTrue: [		total := 0.		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[[bossFile atEnd] whileFalse: [			cur := bossFile next.			((cur class) = Loan)			ifTrue: [				total := total + ((cur initialAmount) - (cur amountPaid)).			]]]			ensure: [bossFile close].	].	printStr := 'The total amount of loan assets is: ', (total printString).	^printStr.</body>
 
-<body package="EECS-395-495-P2" selector="printAccount">printAccount	| printStr |	printStr := 'Account Number: ', (accountNumber printString).	printStr := printStr, '&lt;t&gt;Account type: ', ((self class) printString).	^printStr.</body>
+<body package="EECS-395-495-P2" selector="printAccount">printAccount	| printStr |	printStr := 'Account Number: ', (accountNumber printString).	printStr := printStr, '&lt;n&gt;Account type: ', ((self class) printString).	^printStr.</body>
 
-<body package="EECS-395-495-P2" selector="displayUser:">displayUser: id	| str bossFile cur |		str := ''.	bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.	[[bossFile atEnd] whileFalse: [		cur := bossFile next.		(cur customerID = id)		ifTrue: [			str := str, '&lt;t&gt;&lt;t&gt;', (cur printAccount), '&lt;n&gt;'.		]]]		ensure: [bossFile close].		str = ''	ifTrue: [		'No accounts for customer: ', (id printString).	].	^(str expandMacros).</body>
+<body package="EECS-395-495-P2" selector="displayUser:">displayUser: id	| str bossFile cur |		str := ''.	bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.	[[bossFile atEnd] whileFalse: [		cur := bossFile next.		((cur customerID printString) = id)		ifTrue: [			str := str, (cur printAccount), '&lt;n&gt;'.		]]]		ensure: [bossFile close].		str = ''	ifTrue: [		'No accounts for customer: ', (id printString).	].	^(str expandMacros).</body>
 
-<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := 'Customer ID: ', (customerID printString).	printStr := printStr, '&lt;t&gt;Account type: ', ((self class) printString).	printStr := printStr, '&lt;t&gt;Account Number: ', (accountNumber printString).	printStr := printStr, '&lt;t&gt;Date opened: ', (dateOpened printString).	^printStr.</body>
+<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := 'Customer ID: ', (customerID printString).	printStr := printStr, '&lt;n&gt;Account type: ', ((self class) printString).	printStr := printStr, '&lt;n&gt;Account Number: ', (accountNumber printString).	printStr := printStr, '&lt;n&gt;Date opened: ', (dateOpened printString).	(((self class) printString) = 'Checking').	^printStr.</body>
 
-<body package="EECS-395-495-P2" selector="printAll">printAll	| bossFile accountsArr printStr |	bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no accounts!'.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[accountsArr := bossFile contents.]			ensure: [bossFile close].	].	printStr := ''.	1 to: (accountsArr size) do: [ :index |		printStr := printStr, '&lt;n&gt;', ((accountsArr at: index) toString).	].	^(printStr expandMacros).</body>
+<body package="EECS-395-495-P2" selector="printAll">printAll	| bossFile accountsArr printStr |	bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no accounts!'.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[accountsArr := bossFile contents.]			ensure: [bossFile close].	].	printStr := ''.	1 to: (accountsArr size) do: [ :index |		printStr := printStr, ((accountsArr at: index) toString), '&lt;n&gt;&lt;n&gt;'.	].	^(printStr expandMacros).</body>
 
 <body package="EECS-395-495-P2" selector="accountsOfType:">accountsOfType: type	| bossFile total cur printStr |	bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no accounts!'.	]	ifTrue: [		total := 0.		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[[bossFile atEnd] whileFalse: [			cur := bossFile next.			((cur class) = type)			ifTrue: [				total := total + 1.			]]]			ensure: [bossFile close].	].	printStr := 'The total number of accounts of type: ', (type printString), ' is: ', (total printString).	^printStr.</body>
 </methods>
@@ -304,13 +321,13 @@
 <methods>
 <class-id>Accounts</class-id> <category>modifying</category>
 
-<body package="EECS-395-495-P2" selector="removeAccount:">removeAccount: num	| accounts boss store pos |		boss := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.	[accounts := boss contents]		ensure: [boss close].	pos := nil.	1 to: (accounts size) do: [ :index |		((accounts at: index) accountNumber) = num ifTrue: [pos := index.].	].	pos = nil ifTrue: [		^'Account does not exist!'.	]	ifFalse: [		store := (accounts copyFrom: 1 to: (pos - 1)), (accounts copyFrom: (pos + 1) to: (accounts size)).		boss := BinaryObjectStorage onNew: 'accounts.b' asFilename writeStream.		[boss nextPutAll: store]			ensure: [boss close].	].	^'Account successfully deleted.'.</body>
+<body package="EECS-395-495-P2" selector="removeAccount:">removeAccount: num	| accounts boss id store pos |		boss := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.	[accounts := boss contents]		ensure: [boss close].	pos := nil.	1 to: (accounts size) do: [ :index |		((accounts at: index) accountNumber) printString = num ifTrue: [pos := index.].	].	id := (accounts at: pos) customerID.	pos = nil ifTrue: [		^'Account does not exist!'.	]	ifFalse: [		store := (accounts copyFrom: 1 to: (pos - 1)), (accounts copyFrom: (pos + 1) to: (accounts size)).		boss := BinaryObjectStorage onNew: 'accounts.b' asFilename writeStream.		[boss nextPutAll: store]			ensure: [boss close].	].	^id.</body>
 </methods>
 
 <methods>
 <class-id>Accounts</class-id> <category>initialize-release</category>
 
-<body package="EECS-395-495-P2" selector="initialize:">initialize: id	| bossFile accountsArr |		bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		accountNumber := 1.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[accountsArr := bossFile contents.]			ensure: [bossFile close].		accountNumber := ((accountsArr at: (accountsArr size)) accountNumber) + 1.	].	customerID := id.	dateOpened := Date dateAndTimeNow.	^accountNumber.</body>
+<body package="EECS-395-495-P2" selector="initialize:">initialize: id	| bossFile accountsArr |		bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		accountNumber := 1.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[accountsArr := bossFile contents.]			ensure: [bossFile close].		((accountsArr size) = 0)		ifTrue: [			accountNumber := 1.		]		ifFalse: [			accountNumber := ((accountsArr at: (accountsArr size)) accountNumber) + 1.		].	].	customerID := id.	dateOpened := Date dateAndTimeNow.	^accountNumber.</body>
 
 <body package="EECS-395-495-P2" selector="initialize">initialize	"Initialize a newly created instance. This method must answer the receiver."	super initialize.	" *** Edit the following to properly initialize instance variables ***"	customerID := nil.	dateOpened := nil.	accountNumber := nil.	" *** And replace this comment with additional initialization code *** "	^self</body>
 </methods>
@@ -360,14 +377,6 @@
 
 
 <methods>
-<class-id>Loan</class-id> <category>initialize-release</category>
-
-<body package="EECS-395-495-P2" selector="initialize">initialize	"Initialize a newly created instance. This method must answer the receiver."	super initialize.	" *** Edit the following to properly initialize instance variables ***"	initialAmount := nil.	interestRate := nil.	amountPaid := nil.	dateLastPayment := nil.	amountLastPayment := nil.	" *** And replace this comment with additional initialization code *** "	^self</body>
-
-<body package="EECS-395-495-P2" selector="initialize:initialAmount:interestRate:">initialize: id initialAmount: amount interestRate: rate	| boss dataStream |	super initialize: id.	initialAmount := amount.	interestRate := rate.	amountPaid := 0.	accountNumber = 1 ifTrue: [		dataStream := 'accounts.b' asFilename writeStream.		boss := BinaryObjectStorage onNew: dataStream.		[boss nextPut: self]			ensure: [boss close].	]	ifFalse: [		boss := BinaryObjectStorage onOld: 'accounts.b' asFilename readAppendStream.		boss setToEnd.		[boss nextPut: self]			ensure: [boss close].	].		^accountNumber.</body>
-</methods>
-
-<methods>
 <class-id>Loan</class-id> <category>accessing</category>
 
 <body package="EECS-395-495-P2" selector="initialAmount">initialAmount	^initialAmount</body>
@@ -392,9 +401,17 @@
 </methods>
 
 <methods>
-<class-id>Loan</class-id> <category>private</category>
+<class-id>Loan</class-id> <category>printing</category>
 
-<body package="EECS-395-495-P2" selector="new">new	^self.</body>
+<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := (super toString).	printStr := printStr, '&lt;n&gt;Initial Amount: ', (initialAmount printString).	printStr := printStr, '&lt;n&gt;Interest Rate: ', (interestRate printString).	printStr := printStr, '&lt;n&gt;Amount Paid: ', (amountPaid printString).	printStr := printStr, '&lt;n&gt;Last Payment Date: ', (dateLastPayment printString).	printStr := printStr, '&lt;n&gt;Amount Last Payment: ', (amountLastPayment printString).	^printStr.</body>
+</methods>
+
+<methods>
+<class-id>Loan</class-id> <category>initialize-release</category>
+
+<body package="EECS-395-495-P2" selector="initialize">initialize	"Initialize a newly created instance. This method must answer the receiver."	super initialize.	" *** Edit the following to properly initialize instance variables ***"	initialAmount := nil.	interestRate := nil.	amountPaid := nil.	dateLastPayment := nil.	amountLastPayment := nil.	" *** And replace this comment with additional initialization code *** "	^self</body>
+
+<body package="EECS-395-495-P2" selector="initialize:initialAmount:interestRate:">initialize: id initialAmount: amount interestRate: rate	| boss dataStream |	super initialize: id.	initialAmount := amount.	interestRate := rate.	amountPaid := 0.	amountLastPayment := 0.	accountNumber = 1 ifTrue: [		dataStream := 'accounts.b' asFilename writeStream.		boss := BinaryObjectStorage onNew: dataStream.		[boss nextPut: self]			ensure: [boss close].	]	ifFalse: [		boss := BinaryObjectStorage onOld: 'accounts.b' asFilename readAppendStream.		boss setToEnd.		[boss nextPut: self]			ensure: [boss close].	].		^accountNumber.</body>
 </methods>
 
 
@@ -441,6 +458,12 @@
 <body package="EECS-395-495-P2" selector="currentBalance">currentBalance	^currentBalance</body>
 
 <body package="EECS-395-495-P2" selector="currentBalance:">currentBalance: anObject	currentBalance := anObject</body>
+</methods>
+
+<methods>
+<class-id>Checking</class-id> <category>printing</category>
+
+<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := (super toString).	printStr := printStr, '&lt;n&gt;Current Balance: ', (currentBalance printString).	"printStr := printStr, '&lt;n&gt;Transactions: ', (transactions toString)."	printStr := printStr, '&lt;n&gt;Automatic Payments: '.	1 to: (automaticPayments size) do: [ :index |		printStr := printStr, '&lt;n&gt;', ((automaticPayments at: index) printString).	].	^printStr.</body>
 </methods>
 
 <methods>
@@ -501,28 +524,38 @@
 <methods>
 <class-id>BankAccountGUI class</class-id> <category>interface specs</category>
 
-<body package="EECS-395-495-P2" selector="windowSpec">windowSpec	"Tools.UIPainter new openOnClass: self andSelector: #windowSpec"	&lt;resource: #canvas&gt;	^#(#{UI.FullSpec} 		#window: 		#(#{UI.WindowSpec} 			#label: 'Unlabeled Canvas' 			#bounds: #(#{Graphics.Rectangle} 228 469 1261 960 ) ) 		#component: 		#(#{UI.SpecCollection} 			#collection: #(				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 133 60 233 83 ) 					#name: #InputField1 					#model: #customerName ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 133 102 233 125 ) 					#name: #InputField2 					#model: #customerAddress ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 75 60 ) 					#name: #Label1 					#label: 'Name' ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 63 100 ) 					#name: #Label2 					#label: 'Address' ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 482 78 563 101 ) 					#name: #ActionButton1 					#model: #addCustomer 					#label: 'Add Customer' 					#defaultable: true ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 590 77 738 102 ) 					#name: #InputField3 					#model: #customerIdOut 					#type: #object ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 354 68 ) 					#name: #RadioButton1 					#model: #customerType 					#label: 'Borrower' 					#select: #borrower ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 355 97 ) 					#name: #RadioButton2 					#model: #customerType 					#label: 'Depositor' 					#select: #depositor ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 257 78 ) 					#name: #Label3 					#label: 'Customer Type' ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 731 213 812 236 ) 					#name: #ActionButton2 					#model: #addAccount 					#label: 'Add Account' 					#defaultable: true ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 220 175 ) 					#name: #RadioButton3 					#model: #accountType 					#label: 'Savings' 					#select: #savings ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 221 212 ) 					#name: #RadioButton4 					#model: #accountType 					#label: 'Checking' 					#select: #checking ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 222 247 ) 					#name: #RadioButton5 					#model: #accountType 					#label: 'Loan' 					#select: #loan ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 101 212 201 235 ) 					#name: #InputField4 					#model: #customerIdIn ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 23 214 ) 					#name: #Label4 					#label: 'Customer Id' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 411 172 511 195 ) 					#name: #InputField5 					#model: #savingsInit 					#type: #number ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 602 172 702 195 ) 					#name: #InputField6 					#model: #savingsInterest 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 330 174 ) 					#name: #Label5 					#label: 'Intial Amount' ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 523 174 ) 					#name: #Label6 					#label: 'Interest Rate' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 412 214 512 237 ) 					#name: #InputField7 					#model: #checkingInit 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 330 215 ) 					#name: #Label7 					#label: 'Intial Amount' ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 330 251 ) 					#name: #Label8 					#label: 'Intial Amount' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 412 252 512 275 ) 					#name: #InputField8 					#model: #loanInit 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 523 251 ) 					#name: #Label9 					#label: 'Interest Rate' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 602 252 702 275 ) 					#name: #InputField9 					#model: #loanInterest 					#type: #number ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 842 212 983 237 ) 					#name: #InputField10 					#model: #accountNumberOut 					#type: #object ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 429 54 529 76 ) 					#name: #InputField11 					#model: #empStatus ) ) ) )</body>
+<body package="EECS-395-495-P2" selector="windowSpec">windowSpec	"Tools.UIPainter new openOnClass: self andSelector: #windowSpec"	&lt;resource: #canvas&gt;	^#(#{UI.FullSpec} 		#window: 		#(#{UI.WindowSpec} 			#label: 'Unlabeled Canvas' 			#bounds: #(#{Graphics.Rectangle} 297 562 1330 1053 ) ) 		#component: 		#(#{UI.SpecCollection} 			#collection: #(				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 133 60 233 83 ) 					#name: #InputField1 					#model: #customerName ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 133 102 233 125 ) 					#name: #InputField2 					#model: #customerAddress ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 75 60 ) 					#name: #Label1 					#label: 'Name' ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 63 100 ) 					#name: #Label2 					#label: 'Address' ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 482 78 563 101 ) 					#name: #ActionButton1 					#model: #addCustomer 					#label: 'Add Customer' 					#defaultable: true ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 590 77 738 102 ) 					#name: #InputField3 					#model: #customerIdOut 					#type: #object ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 354 68 ) 					#name: #RadioButton1 					#model: #customerType 					#label: 'Borrower' 					#select: #borrower ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 355 97 ) 					#name: #RadioButton2 					#model: #customerType 					#label: 'Depositor' 					#select: #depositor ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 257 78 ) 					#name: #Label3 					#label: 'Customer Type' ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 731 213 812 236 ) 					#name: #ActionButton2 					#model: #addAccount 					#label: 'Add Account' 					#defaultable: true ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 220 175 ) 					#name: #RadioButton3 					#model: #accountType 					#label: 'Savings' 					#select: #savings ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 221 212 ) 					#name: #RadioButton4 					#model: #accountType 					#label: 'Checking' 					#select: #checking ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 222 247 ) 					#name: #RadioButton5 					#model: #accountType 					#label: 'Loan' 					#select: #loan ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 101 212 201 235 ) 					#name: #InputField4 					#model: #customerIdIn 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 23 214 ) 					#name: #Label4 					#label: 'Customer Id' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 411 172 511 195 ) 					#name: #InputField5 					#model: #savingsInit 					#type: #number ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 602 172 702 195 ) 					#name: #InputField6 					#model: #savingsInterest 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 330 174 ) 					#name: #Label5 					#label: 'Intial Amount' ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 523 174 ) 					#name: #Label6 					#label: 'Interest Rate' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 412 214 512 237 ) 					#name: #InputField7 					#model: #checkingInit 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 330 215 ) 					#name: #Label7 					#label: 'Intial Amount' ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 330 251 ) 					#name: #Label8 					#label: 'Intial Amount' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 412 252 512 275 ) 					#name: #InputField8 					#model: #loanInit 					#type: #number ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 523 251 ) 					#name: #Label9 					#label: 'Interest Rate' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 602 252 702 275 ) 					#name: #InputField9 					#model: #loanInterest 					#type: #number ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 842 212 983 237 ) 					#name: #InputField10 					#model: #accountNumberOut 					#type: #object ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 429 54 529 76 ) 					#name: #InputField11 					#model: #empStatus ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 108 329 247 348 ) 					#name: #ActionButton3 					#model: #numberOfCustomers 					#label: 'Number of Customers' 					#defaultable: true ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 110 356 239 375 ) 					#name: #ActionButton4 					#model: #numberOfAccounts 					#label: 'Number of Accounts' 					#defaultable: true ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 111 382 191 402 ) 					#name: #ActionButton5 					#model: #totalLoans 					#label: 'Total Loans' 					#defaultable: true ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 109 406 191 426 ) 					#name: #ActionButton6 					#model: #totalAssets 					#label: 'Total Assets' 					#defaultable: true ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 107 429 230 448 ) 					#name: #ActionButton7 					#model: #searchCustomer 					#label: 'Search for Customer' 					#defaultable: true ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 104 453 189 475 ) 					#name: #ActionButton8 					#model: #listAccounts 					#label: 'List Accounts' 					#defaultable: true ) 				#(#{UI.TextEditorSpec} 					#layout: #(#{Graphics.Rectangle} 378 333 703 438 ) 					#name: #TextEditor1 					#model: #queryResult 					#tabRequiresControl: true ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 8 428 108 450 ) 					#name: #InputField13 					#model: #customerIDOrName ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 9 361 ) 					#name: #RadioButton6 					#model: #queryAccountType 					#label: 'Savings' 					#select: #savings ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 9 381 ) 					#name: #RadioButton7 					#model: #queryAccountType 					#label: 'Checking' 					#select: #checking ) 				#(#{UI.RadioButtonSpec} 					#layout: #(#{Core.Point} 9 399 ) 					#name: #RadioButton8 					#model: #queryAccountType 					#label: 'Loan' 					#select: #loan ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 578 113 689 132 ) 					#name: #ActionButton9 					#model: #removeCustomer 					#label: 'Remove Customer' 					#defaultable: true ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 786 293 890 314 ) 					#name: #ActionButton10 					#model: #removeAccount 					#label: 'Remove Account' 					#defaultable: true ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 474 111 574 133 ) 					#name: #InputField12 					#model: #removeID ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 686 291 786 313 ) 					#name: #InputField14 					#model: #removeNum ) 				#(#{UI.LabelSpec} 					#layout: #(#{Core.Point} 77 20 ) 					#name: #Label10 					#label: 'Automatic Payment' ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 214 17 314 39 ) 					#name: #InputField15 					#model: #accountID 					#type: #number ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 330 17 430 39 ) 					#name: #InputField16 					#model: #paymentType ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 449 17 549 39 ) 					#name: #InputField17 					#model: #paymentDate ) 				#(#{UI.ActionButtonSpec} 					#layout: #(#{Graphics.Rectangle} 568 19 733 38 ) 					#name: #ActionButton11 					#model: #automaticPayment 					#label: 'Create Automatic Payment' 					#defaultable: true ) 				#(#{UI.InputFieldSpec} 					#layout: #(#{Graphics.Rectangle} 756 19 856 41 ) 					#name: #InputField18 					#model: #automaticPaymentOutput ) ) ) )</body>
 </methods>
 
 
 <methods>
 <class-id>BankAccountGUI</class-id> <category>aspects</category>
 
-<body package="EECS-395-495-P2" selector="accountType">accountType	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^accountType isNil		ifTrue:			[accountType := nil asValue]		ifFalse:			[accountType]</body>
+<body package="EECS-395-495-P2" selector="accountType">accountType	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^accountType isNil		ifTrue:			[accountType := String new asValue]		ifFalse:			[accountType]</body>
+
+<body package="EECS-395-495-P2" selector="paymentType">paymentType	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^paymentType isNil		ifTrue:			[paymentType := String new asValue]		ifFalse:			[paymentType]</body>
+
+<body package="EECS-395-495-P2" selector="removeID">removeID	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^removeID isNil		ifTrue:			[removeID := String new asValue]		ifFalse:			[removeID]</body>
 
 <body package="EECS-395-495-P2" selector="empStatus">empStatus	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^empStatus isNil		ifTrue:			[empStatus := String new asValue]		ifFalse:			[empStatus]</body>
 
 <body package="EECS-395-495-P2" selector="loanInterest">loanInterest	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^loanInterest isNil		ifTrue:			[loanInterest := 0 asValue]		ifFalse:			[loanInterest]</body>
 
-<body package="EECS-395-495-P2" selector="customerType">customerType	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerType isNil		ifTrue:			[customerType := nil asValue]		ifFalse:			[customerType]</body>
+<body package="EECS-395-495-P2" selector="queryAccountType">queryAccountType	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^queryAccountType isNil		ifTrue:			[queryAccountType := nil asValue]		ifFalse:			[queryAccountType]</body>
+
+<body package="EECS-395-495-P2" selector="customerIDOrName">customerIDOrName	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerIDOrName isNil		ifTrue:			[customerIDOrName := String new asValue]		ifFalse:			[customerIDOrName]</body>
 
 <body package="EECS-395-495-P2" selector="accountNumberOut">accountNumberOut	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^accountNumberOut isNil		ifTrue:			[accountNumberOut := nil asValue]		ifFalse:			[accountNumberOut]</body>
 
-<body package="EECS-395-495-P2" selector="savingsInit">savingsInit	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^savingsInit isNil		ifTrue:			[savingsInit := 0 asValue]		ifFalse:			[savingsInit]</body>
+<body package="EECS-395-495-P2" selector="customerType">customerType	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerType isNil		ifTrue:			[customerType := nil asValue]		ifFalse:			[customerType]</body>
 
 <body package="EECS-395-495-P2" selector="checkingInit">checkingInit	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^checkingInit isNil		ifTrue:			[checkingInit := 0 asValue]		ifFalse:			[checkingInit]</body>
 
 <body package="EECS-395-495-P2" selector="customerAddress">customerAddress	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerAddress isNil		ifTrue:			[customerAddress := String new asValue]		ifFalse:			[customerAddress]</body>
+
+<body package="EECS-395-495-P2" selector="savingsInit">savingsInit	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^savingsInit isNil		ifTrue:			[savingsInit := 0 asValue]		ifFalse:			[savingsInit]</body>
+
+<body package="EECS-395-495-P2" selector="queryResult">queryResult	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^queryResult isNil		ifTrue:			[queryResult := String new asValue]		ifFalse:			[queryResult]</body>
 
 <body package="EECS-395-495-P2" selector="savingsInterest">savingsInterest	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^savingsInterest isNil		ifTrue:			[savingsInterest := 0 asValue]		ifFalse:			[savingsInterest]</body>
 
@@ -530,17 +563,43 @@
 
 <body package="EECS-395-495-P2" selector="customerName">customerName	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerName isNil		ifTrue:			[customerName := String new asValue]		ifFalse:			[customerName]</body>
 
-<body package="EECS-395-495-P2" selector="customerIdIn">customerIdIn	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerIdIn isNil		ifTrue:			[customerIdIn := String new asValue]		ifFalse:			[customerIdIn]</body>
+<body package="EECS-395-495-P2" selector="customerIdIn">customerIdIn	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerIdIn isNil		ifTrue:			[customerIdIn := 0 asValue]		ifFalse:			[customerIdIn]</body>
+
+<body package="EECS-395-495-P2" selector="paymentDate">paymentDate	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^paymentDate isNil		ifTrue:			[paymentDate := String new asValue]		ifFalse:			[paymentDate]</body>
+
+<body package="EECS-395-495-P2" selector="automaticPaymentOutput">automaticPaymentOutput	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^automaticPaymentOutput isNil		ifTrue:			[automaticPaymentOutput := String new asValue]		ifFalse:			[automaticPaymentOutput]</body>
+
+<body package="EECS-395-495-P2" selector="accountID">accountID	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^accountID isNil		ifTrue:			[accountID := 0 asValue]		ifFalse:			[accountID]</body>
 
 <body package="EECS-395-495-P2" selector="customerIdOut">customerIdOut	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^customerIdOut isNil		ifTrue:			[customerIdOut := nil asValue]		ifFalse:			[customerIdOut]</body>
+
+<body package="EECS-395-495-P2" selector="removeNum">removeNum	"This method was generated by UIDefiner.  Any edits made here	may be lost whenever methods are automatically defined.  The	initialization provided below may have been preempted by an	initialize method."	^removeNum isNil		ifTrue:			[removeNum := String new asValue]		ifFalse:			[removeNum]</body>
 </methods>
 
 <methods>
 <class-id>BankAccountGUI</class-id> <category>actions</category>
 
-<body package="EECS-395-495-P2" selector="addAccount">addAccount	| number |	number := -1.	customerIdIn value = ''	ifTrue: [ accountNumberOut value: 'please enter a CustomerId'. ^-1].	accountType value = #savings	ifTrue: [number := Savings new initialize: (customerIdIn value) currentBalance: (savingsInit value) interestRate: (savingsInterest value)].	accountType value = #checking	ifTrue: [number := Checking new initialize: (customerIdIn value) currentBalance: (checkingInit value)].	accountType value = #loan	ifTrue: [number := Loan new initialize: (customerIdIn value) initialAmount: (loanInit value) interestRate: (loanInterest value)].	number = -1	ifTrue: [accountNumberOut value: 'please select a type'. ^-1].	accountNumberOut value: number.</body>
+<body package="EECS-395-495-P2" selector="addAccount">addAccount	| number |	number := -1.	customerIdIn value = 0	ifTrue: [ accountNumberOut value: 'please enter a CustomerId'. ^-1].	accountType value = #savings	ifTrue: [number := Savings new initialize: (customerIdIn value) currentBalance: (savingsInit value) interestRate: (savingsInterest value)].	accountType value = #checking	ifTrue: [number := Checking new initialize: (customerIdIn value) currentBalance: (checkingInit value)].	accountType value = #loan	ifTrue: [number := Loan new initialize: (customerIdIn value) initialAmount: (loanInit value) interestRate: (loanInterest value)].	number = -1	ifTrue: [accountNumberOut value: 'please select a type'. ^-1].	accountNumberOut value: number.</body>
+
+<body package="EECS-395-495-P2" selector="removeAccount">removeAccount	| bossFile accounts customerID pos |	customerID := Accounts new removeAccount: (removeNum value).	bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.	[accounts := bossFile contents]		ensure: [bossFile close].	pos := -1.	1 to: (accounts size) do: [ :index |		((accounts at: index) accountNumber) = customerID		ifTrue:			[pos := 1].	].	pos = -1	ifTrue: [		Customers new removeCustomer: customerID	].	^self</body>
+
+<body package="EECS-395-495-P2" selector="numberOfCustomers">numberOfCustomers	queryResult value: (Customers new totalCustomers).	^self.</body>
 
 <body package="EECS-395-495-P2" selector="addCustomer">addCustomer	| id |		id := -1.	customerName value = ''	ifTrue: [ customerIdOut value: 'please enter a name'. ^-1].	customerAddress value= ''	ifTrue: [ customerIdOut value: 'please enter an address'. ^-1].	customerType value = #borrower	ifTrue: [ 		empStatus value=''		ifTrue: [customerIdOut value: 'please enter an employment statue'. ^-1.]		ifFalse: [id := Borrower new initialize: (empStatus value) name: (customerName value) address: (customerAddress value).].].	customerType value = #depositor	ifTrue: [ id := Depositor new initialize: (customerName value) address: (customerAddress value)].	id = -1	ifTrue: [ customerIdOut value: 'please select a type'. ^-1].	customerIdOut value: id.</body>
+
+<body package="EECS-395-495-P2" selector="removeCustomer">removeCustomer	| customer |	customer := Customers new. 	customer removeCustomer: (removeID value).	customer removeAccounts: (removeID value).	^self</body>
+
+<body package="EECS-395-495-P2" selector="searchCustomer">searchCustomer	queryResult value: (Customers new displayUser: (customerIDOrName value)).	^self</body>
+
+<body package="EECS-395-495-P2" selector="totalAssets">totalAssets	queryResult value: (Accounts new totalAssets).	^self.</body>
+
+<body package="EECS-395-495-P2" selector="totalLoans">totalLoans	queryResult value: (Accounts new totalLoans).	^self.</body>
+
+<body package="EECS-395-495-P2" selector="automaticPayment">automaticPayment	| payment bossFile accountsArr cur automaticPayments |	payment := AutomaticPayment new initialize: (paymentType value) paymentDate: (paymentDate value).		bossFile := 'accounts.b' asFilename.	bossFile exists ifFalse: [		^'This bank account system has no accounts!'.	]	ifTrue: [		bossFile := BinaryObjectStorage onOldNoScan: 'accounts.b' asFilename readStream.		[accountsArr := bossFile contents.]			ensure: [bossFile close].	].	1 to: (accountsArr size) do: [ :index |		(((accountsArr at: index) accountNumber) = (accountID value))		ifTrue: [			cur := accountsArr at: index.		].	].	cur = nil	ifTrue: [		automaticPaymentOutput value: 'No such account exists!'.		^-1.	]	ifFalse: [		automaticPayments := (cur automaticPayments).		automaticPayments = nil		ifTrue: [			automaticPayments := List new.		].		automaticPayments add: payment.	].	^self</body>
+
+<body package="EECS-395-495-P2" selector="numberOfAccounts">numberOfAccounts	(queryAccountType value) = #savings	ifTrue: [		queryResult value: (Accounts new accountsOfType: Savings).	].	(queryAccountType value) = #checking	ifTrue: [		queryResult value: (Accounts new accountsOfType: Checking).	].	(queryAccountType value) = #loan	ifTrue: [		queryResult value: (Accounts new accountsOfType: Loan).	].	^self.</body>
+
+<body package="EECS-395-495-P2" selector="listAccounts">listAccounts	queryResult value: (Accounts new printAll).	^self.</body>
 </methods>
 
 
@@ -562,6 +621,33 @@
 <body package="EECS-395-495-P2" selector="initialize">initialize	"Initialize a newly created instance. This method must answer the receiver."	super initialize.	" *** Edit the following to properly initialize instance variables ***"	loadID := nil.	employmentStatus := nil.	" *** And replace this comment with additional initialization code *** "	^self</body>
 
 <body package="EECS-395-495-P2" selector="initialize:name:address:">initialize: empStatus name: customerName address: customerAddress	| boss dataStream |	super initialize: customerName address: customerAddress.	employmentStatus := empStatus.	customerID = 1 ifTrue: [		dataStream := 'customers.b' asFilename writeStream.		boss := BinaryObjectStorage onNew: dataStream.		[boss nextPut: self]			ensure: [boss close].	]	ifFalse: [		boss := BinaryObjectStorage onOld: 'customers.b' asFilename readAppendStream.		boss setToEnd.		[boss nextPut: self]			ensure: [boss close].	].	^customerID.</body>
+</methods>
+
+
+<methods>
+<class-id>AutomaticPayment</class-id> <category>accessing</category>
+
+<body package="EECS-395-495-P2" selector="paymentType:">paymentType: anObject	paymentType := anObject</body>
+
+<body package="EECS-395-495-P2" selector="paymentType">paymentType	^paymentType</body>
+
+<body package="EECS-395-495-P2" selector="paymentDate:">paymentDate: anObject	paymentDate := anObject</body>
+
+<body package="EECS-395-495-P2" selector="paymentDate">paymentDate	^paymentDate</body>
+</methods>
+
+<methods>
+<class-id>AutomaticPayment</class-id> <category>printing</category>
+
+<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := (paymentType printString), ', ', (paymentDate printString).	^printStr.</body>
+</methods>
+
+<methods>
+<class-id>AutomaticPayment</class-id> <category>initialize-release</category>
+
+<body package="EECS-395-495-P2" selector="initialize">initialize	"Initialize a newly created instance. This method must answer the receiver."	super initialize.	" *** Edit the following to properly initialize instance variables ***"	paymentType := nil.	paymentDate := nil.	" *** And replace this comment with additional initialization code *** "	^self</body>
+
+<body package="EECS-395-495-P2" selector="initialize:paymentDate:">initialize: type paymentDate: date	paymentType := type.	paymentDate := date.	^self.</body>
 </methods>
 
 
@@ -600,6 +686,12 @@
 <body package="EECS-395-495-P2" selector="recentTransactions:">recentTransactions: anObject	recentTransactions := anObject</body>
 
 <body package="EECS-395-495-P2" selector="interestRate:">interestRate: anObject	interestRate := anObject</body>
+</methods>
+
+<methods>
+<class-id>Savings</class-id> <category>printing</category>
+
+<body package="EECS-395-495-P2" selector="toString">toString	| printStr |	printStr := (super toString).	printStr := printStr, '&lt;n&gt;Current Balance: ', (currentBalance printString).	printStr := printStr, '&lt;n&gt;Interest Rate: ', (interestRate printString).	"printStr := printStr, '&lt;n&gt;Transactions: ', (transactions toString)."	^printStr.</body>
 </methods>
 
 <methods>
