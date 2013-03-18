@@ -1,17 +1,20 @@
 #include <iostream>
 #include "MyCollection.h"
-#include "MyList.h"
-#include <list>
 
 using namespace std;
 
 int main ()
 {
-     int myints[] = { 75,23,65,42,13 };
-     MyList<int> myl1 (myints, myints + 5);
-     MyCollection<int>* p1 = myl1;
-     cout << "My list starts with: ";
-     MyCollection<int>::iterator it = p1->begin();
-     cout << ' ' << *it;
-     return 0;
+    int myints[] = { 75, 23, 65, 42, 13 };
+    MyVector<int, 5> vect(myints, myints+5);
+    MyVector<int, 5>::iterator it(vect, 4);
+    for (it; it != --vect.begin(); --it)
+    {
+        printf("%d\n", *it);
+    }
+    MyVector<int, 5> myv;
+    int i = myv.starting_element();
+    int j = myv.last_element();
+    printf("%d %d\n", i, j);
+    return 0;
 }
