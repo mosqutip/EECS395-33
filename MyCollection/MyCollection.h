@@ -38,8 +38,8 @@ class MyVector : public MyCollection<T>
             vect = vector<int>(nums, len);
             this->size = (int)vect.size();
         }
-        iterator begin() { return iterator(*this, 0); }
-        iterator end() { return iterator(*this, this->size); }
+        MyIterator<T> begin() { return MyIterator<T>(*this, 0); }
+        MyIterator<T> end() { return MyIterator<T>(*this, this->size); }
 
         // So it will work.
         void value_at_position(int i) {
