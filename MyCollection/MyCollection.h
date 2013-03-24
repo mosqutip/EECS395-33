@@ -1,220 +1,322 @@
 #include <list>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
-template <class T>
+/*
+ * Forward declarations for convenience and necessity.
+ */
+template <typename T>
+class MyIteratorBase;
+
+template <typename T>
 class MyIterator;
 
-template <class T>
+template <typename T>
+class MyListIterator;
+
+template <typename T>
+class MyVector;
+
+template <typename T>
+class MyList;
+
+/*
+ * Base collection class for the project, associated with the MyIterator class.
+ * This container allows for the use of, and iteration over, vectors and lists.
+ */
+template <typename T>
 class MyCollection
 {
-    //friend class MyVectorIterator<T>;
-    //friend class MyListIterator<T>;
-    friend class MyIterator<T>;
-
-    private:
+    friend class MyIteratorBase<T>;
 
     protected:
         int size;
         
     public:
-        //typedef MyVectorIterator<T> iterator;
-        //typedef MyListIterator<T> iterator;
         typedef MyIterator<T> iterator;
         typedef ptrdiff_t difference_type;
         typedef size_t size_type;
         typedef T value_type;
         typedef T *pointer;
         typedef T &reference;
-        // Not pure virtual
-        virtual int starting_element()
-        {
-            int myints2[5];
-            //MyVector<int> vect(myints2, myints2+5);
-            //MyVector<int>::iterator it(vect, 0);
-            return 0;
-        };
 
-		iterator begin();
-		iterator end();
+        virtual iterator begin() = 0;
+        virtual iterator end() = 0;
 
-        // Not pure virtual
-        virtual int last_element()
+        // Pure virtual, since implementation depends on data structure.
+        virtual T starting_element() = 0;
+
+        // Pure virtual, since implementation depends on data structure.
+        virtual T last_element() = 0;
+
+        // Non-pure virtual, since iterator is convenient.
+        virtual T value_at_position(int i)
         {
-            int myints2[5];
-            //MyVector<int> vect(myints2, myints2+5);
-            //MyVector<int>::iterator it(vect, 4);
-            return 0;
+            iterator it = this->begin();
+            for (int j = 0; j < i; j++) {
+                ++it;
+            }
+            return *it;
         }
 
-        // Pure virtual
-        virtual void value_at_position(int i) = 0;
-
-        // ???
-        virtual void show_all() = 0;
+        // Non-pure virtual, since iterator is convenient.
+        virtual void show_all()
+        {
+            iterator it = this->begin();
+            for (it; it != this->end(); ++it) {
+                cout << *it << endl;
+            }
+        }
 };
 
-template <class T>
-class MyVectorIterator;
-
-template <class T>
+/*
+ * MyVector data structures for vector types. The underlying structure used
+ * here is present in the stl_vector.h file, included in this directory.
+ */
+template <typename T>
 class MyVector : public MyCollection<T>
 {
-    friend class MyVectorIterator<T>;
-
-    private:
+    friend class MyIterator<T>;
 
     protected:
-         vector<int> vect;
+         vector<T> vect;
 
     public:
-        typedef MyVectorIterator<T> iterator;
+        typedef MyIterator<T> iterator;
 
-        int &operator[] (int i) {
+        T &operator[] (int i) {
             return vect[i];
         }
         MyVector() {}
-        MyVector(int nums[], int* len)
+        MyVector(T nums[], T* len)
         {
-            vect = vector<int>(nums, len);
+            vect = vector<T>(nums, len);
             this->size = (int)vect.size();
         }
-        iterator begin() { return MyVectorIterator<T>(*this, 0); }
-        iterator end() { return MyVectorIterator<T>(*this, this->size); }
-
-        // So it will work.
-        void value_at_position(int i) {
-            return;
+        iterator begin()
+        {
+            T myints[] = { 75, 23, 65, 42, 13 };
+            MyList<T> lst(myints, myints+5);
+            return MyIterator<T>(*this, lst, 0);
         }
-        void show_all() {
-            return;
+        iterator end()
+        {
+            T myints[] = { 75, 23, 65, 42, 13 };
+            MyList<T> lst(myints, myints+5);
+            return MyIterator<T>(*this, lst, this->size);
+        }
+
+        // Override of the pure virtual functions specific to vectors.
+        T starting_element()
+        {
+            return vect[0]; 
+        }
+        T last_element()
+        {
+            return vect[((this->size) - 1)];
         }
 };
 
-template <class T>
-class MyListIterator;
-
-template <class T>
+/*
+ * MyList data structures for list types. The underlying structure used
+ * here is present in the stl_list.h file, included in this directory.
+ */
+template <typename T>
 class MyList : public MyCollection<T>
 {
     friend class MyListIterator<T>;
 
     private:
-        list<int>::iterator itb;
-        list<int>::iterator ite;
+        typename list<T>::iterator itb;
+        typename list<T>::iterator ite;
 
     protected:
-        list<int> lst;
+        list<T> lst;
 
     public:
-        list<int>::iterator itBegin() { return itb; }
-        list<int>::iterator itEnd() { return ite; }
-        typedef MyListIterator<T> iterator;
+        typedef MyIterator<T> iterator;
+
+        typename list<T>::iterator itBegin()
+        {
+            return itb;
+        }
+        typename list<T>::iterator itEnd()
+        {
+            return ite;
+        }
 
         MyList() {}
-        MyList(int nums[], int* len)
+        MyList(T nums[], T* len)
         {
-            lst = list<int>(nums, len);
+            lst = list<T>(nums, len);
             this->size = (int)lst.size();
             itb = lst.begin();
             ite = lst.end();
         }
-        iterator begin() { return MyListIterator<T>(*this, 0); }
-        iterator end() { return MyListIterator<T>(*this, this->size); }
-
-        // So it will work
-        void value_at_position(int i) {
-            return;
+        iterator begin()
+        {
+            T myints[] = { 75, 23, 65, 42, 13 }; 
+            MyVector<T> vect(myints, myints+5);
+            return MyIterator<T>(*this, vect, 0);
         }
-        void show_all() {
-            return;
+        iterator end()
+        {
+            T myints[] = { 75, 23, 65, 42, 13 };
+            MyVector<T> vect(myints, myints+5);
+            return MyIterator<T>(*this, vect, this->size);
+        }
+
+        // Override of the pure virtual functions specific to vectors.
+        T starting_element()
+        {
+            return lst.front(); 
+        }
+        T last_element()
+        {
+            return lst.back();
         }
 };
 
-template <class T>
-class MyIterator {
+/*
+ * Base class for the iterator, which acts as an abstract class defining
+ * the required functions that a useful iterator must implement, including 
+ * increment, decrement, and comparisons.
+ */
+template <typename T>
+class MyIteratorBase
+{
     protected:
-        virtual bool equal(const MyIterator& rhs) { return true; }
+        virtual bool equal(const MyIteratorBase& rhs)
+        {
+            return true;
+        }
 
     public:
-        MyIterator() {}
-        virtual ~MyIterator() {}
+        MyIteratorBase() {}
+        virtual ~MyIteratorBase() {}
         T &operator*();
         void operator++();
         void operator++(int);
         void operator--();
         void operator--(int);
-        bool operator==(const MyIterator& rhs) {
+        bool operator==(const MyIteratorBase& rhs)
+        {
             return typeid(*this) == typeid(rhs) && equal(rhs);
         }
-        bool operator!=(const MyIterator& rhs) {
+        bool operator!=(const MyIteratorBase& rhs)
+        {
             return typeid(*this) != typeid(rhs) || !equal(rhs);            
         }
 };
 
-template <class T>
-class MyVectorIterator : public MyIterator<T> {
+/*
+ * Main iterator class that operates on the MyCollection type. By passing a 
+ * flag for the type of underlying data structure, the appropriate subclass 
+ * iterator is created and setup.
+ */
+template <typename T>
+class MyIterator : public MyIteratorBase<T>
+{
     private:
-        MyVector<T> &collection;
-        int offset;
-
-    public:
-        MyVectorIterator() {}
-        MyVectorIterator(MyVector<T> &c, int size) : collection(c), offset(size) {}
-        //~MyVectorIterator() { delete this; }
-        MyVectorIterator operator=(const MyVectorIterator &rhs)
-        {
-            if (*this != &rhs) { delete *this; *this = &rhs->clone(); }
-            return *this;
-        }
-        T &operator*() { return collection[offset]; }
-        MyVectorIterator operator++() { ++offset; return *this; }
-        MyVectorIterator operator++(int) {
-            MyVectorIterator<T> clone(*this);
-            ++offset;
-            return clone;
-        }
-        MyVectorIterator operator--() { --offset; return *this; }
-        MyVectorIterator operator--(int) {
-            MyVectorIterator<T> clone(*this);
-            --offset;
-            return clone;
-        }
-        bool operator==(const MyVectorIterator& rhs) { return &collection[offset]==(&rhs.collection[rhs.offset]); }
-        bool operator!=(const MyVectorIterator& rhs) { return &collection[offset]!=(&rhs.collection[rhs.offset]); }
-};
-
-template <class T>
-class MyListIterator : public MyIterator<T> {
-    private:
+        MyVector<T> &collectionV;
         MyList<T> &collection;
-        list<int>::iterator it;
+        int offset;
+        int isList;
+        typename list<T>::iterator it;
 
     public:
-        MyListIterator() {}
-        MyListIterator(MyList<T> &c, int size) : collection(c)
+        MyIterator() {}
+        MyIterator(MyList<T> &c, MyVector<T> v, int size) : collection(c), collectionV(v), offset(size)
         {
+            isList = 1;
             if (size == 0)
             {
-                it = collection.itBegin();
+                it = collection.MyList<T>::itBegin();
             }
             else
             {
-                it = collection.itEnd();
+                it = collection.MyList<T>::itEnd();
             }
         }
-        //~MyListIterator() { delete this; }
-        MyListIterator operator=(const MyListIterator &rhs)
+        MyIterator(MyVector<T> &c, MyList<T> v, int size) : collectionV(c), collection(v), offset(size) 
         {
-            if (*this != &rhs) { delete *this; *this = &rhs->clone(); }
+            isList = 0;
+        }
+        //~MyIterator() { delete this; }
+        MyIterator operator=(const MyIterator &rhs)
+        {
+            if (*this != &rhs) {
+                delete *this; *this = &rhs->clone();
+            }
             return *this;
         }
-        T &operator*() { return *it; }
-        MyListIterator operator++() { ++it; return *this; }
-        MyListIterator operator++(int) { it++; return *this; }
-        MyListIterator operator--() { --it; return *this; }
-        MyListIterator operator--(int) { it--; return *this; }
-        bool operator==(const MyListIterator& rhs) { return it==rhs.it; }
-        bool operator!=(const MyListIterator& rhs) { return it!=rhs.it; }
+        T &operator*()
+        { 
+            if (isList == 0)
+                return collectionV[offset]; 
+            else
+                return *it;
+        }
+        MyIterator operator++()
+        { 
+            if (isList == 0) {
+                ++offset;
+                return *this;
+            }
+            else {
+                ++it;
+                return *this;
+            }
+        }
+        MyIterator operator++(int)
+        {
+            if (isList == 0) {
+                MyIterator<T> clone(*this);
+                ++offset;
+                return clone;
+            }
+            else {
+                it++;
+                return *this;
+            }
+        }
+        MyIterator operator--()
+        {
+            if (isList == 0) {
+                --offset;
+                return *this; 
+            }
+            else {
+                --it;
+                return *this;
+            }
+        }
+        MyIterator operator--(int)
+        {
+            if (isList == 0) {
+                MyIterator<T> clone(*this);
+                --offset;
+                return clone;
+            }
+            else {
+                it--;
+                return *this;
+            }
+        }
+        bool operator==(const MyIterator& rhs)
+        { 
+            if (isList == 0)
+                return (&collectionV[offset] == (&rhs.collectionV[rhs.offset])); 
+            else
+                return (it == rhs.it);
+        }
+        bool operator!=(const MyIterator& rhs)
+        { 
+            if (isList == 0)
+                return (&collectionV[offset]!=(&rhs.collectionV[rhs.offset])); 
+            else
+                return (it!=rhs.it);
+        }
 };
